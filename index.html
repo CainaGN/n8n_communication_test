@@ -54,7 +54,7 @@
     chatBox.appendChild(loadingDiv);
 
     try {
-        const response = await fetch('https://cainagn.app.n8n.cloud/webhook/d53ed432-f004-4eba-93eb-85c5223fdabe', {  // Mude para webhook (sem -test) se ainda não!
+        const response = await fetch('https://playfivefive.app.n8n.cloud/webhook/d53ed432-f004-4eba-93eb-85c5223fdabe', {  // Mude para webhook (sem -test) se ainda não!
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chatInput: texto, sessionId: meuSessionId })
