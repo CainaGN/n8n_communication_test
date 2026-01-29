@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat IA Corporativo</title>
+    <title>Suporte Play55</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Markdown-it para renderizar Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
@@ -35,86 +35,149 @@
     </div>
 
     <script>
-        const meuSessionId = "user_" + Math.random().toString(36).substr(2, 9);
+    const meuSessionId = "user_" + Math.random().toString(36).substr(2, 9);
+    
+    // Instância global do markdown-it
+    const md = window.markdownit({
+        html: true,
+        linkify: true,
+        typographer: true,
+        breaks: true
+    });
+
+    // Elementos que vamos controlar
+    const inputPergunta = document.getElementById('pergunta');
+    const btnEnviar = document.querySelector('button[onclick="enviarParaN8N()"]'); // ou dê um id ao botão
+
+    // Função auxiliar para bloquear/desbloquear
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            btnEnviar.disabled = true;
+            btnEnviar.textContent = 'Enviando...'; // ou mantenha "Enviar" e use outra forma de indicar loading
+            btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
+            inputPergunta.disabled = true; // opcional: bloqueia o input também
+        } else {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = 'Enviar';
+            btnEnviar.classList.remove('opacity-50', 'cursor-not-allowed');
+            inputPergunta.disabled = false;
+        }
+    }
+
+    async function enviarParaN8N() {
+        const chatBox = document.getElementById('chat-box');
+        const origem = document.getElementById('origem').value;
+        const texto = inputPergunta.value.trim();
+
+        if (!texto) return;
+
+        // Bloqueia imediatamente
+        setLoadingState(true);
+
+        // Mostra mensagem do usuário
+        chatBox.innerHTML += `
+            <div class="flex justify-end">
+                <div class="bg-blue-500 text-white p-3 rounded-lg max-w-[80%] shadow-sm text-xs mb-1">
+                    <small class="block opacity-75">Origem: ${origem}</small>
+                    ${texto}
+                </div>
+            </div>`;
         
-        // Instância global do markdown-it
-        const md = window.markdownit({
-            html: true,
-            linkify: true,
-            typographer: true,
-            breaks: true
-        });
+        inputPergunta.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-        async function enviarParaN8N() {
-            const input = document.getElementById('pergunta');
-            const chatBox = document.getElementById('chat-box');
-            const origem = document.getElementById('origem').value;
-            const texto = input.value.trim();
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = "loading";
+        loadingDiv.innerHTML = `<div class="bg-gray-200 p-3 rounded-lg inline-block animate-pulse">AmandAI está digitando...</div>`;
+        chatBox.appendChild(loadingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-            if (!texto) return;
+        try {
+            const response = await fetch('https://playfivefive.app.n8n.cloud/webhook/d53ed432-f004-4eba-93eb-85c5223fdabe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chatInput: texto, 
+                    sessionId: meuSessionId, 
+                    platform: origem,
+                    pracaId: "Sorte Cap",
+                    formulario_contato: "[Clique aqui](https://longdogechallenge.com/)"
+                })
+            });
 
-            // Mostra mensagem do usuário
+            const responseText = await response.text();
+            
+            document.getElementById('loading')?.remove();
+
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+
+            const htmlResponse = md.render(responseText);
+
             chatBox.innerHTML += `
-                <div class="flex justify-end">
-                    <div class="bg-blue-500 text-white p-3 rounded-lg max-w-[80%] shadow-sm text-xs mb-1">
-                        <small class="block opacity-75">Origem: ${origem}</small>
-                        ${texto}
+                <div class="flex justify-start">
+                    <div class="bg-white border p-3 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none">
+                        <strong>AmandAI:</strong><br>
+                        ${htmlResponse}
                     </div>
                 </div>`;
             
-            input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = "loading";
-            loadingDiv.innerHTML = `<div class="bg-gray-200 p-3 rounded-lg inline-block animate-pulse">IA está pensando...</div>`;
-            chatBox.appendChild(loadingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const response = await fetch('https://playfivefive.app.n8n.cloud/webhook/d53ed432-f004-4eba-93eb-85c5223fdabe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        chatInput: texto, 
-                        sessionId: meuSessionId, 
-                        platform: origem,
-                        pracaId: "Sorte Cap"
-                    })
-                });
-
-                const responseText = await response.text();
-                
-                document.getElementById('loading')?.remove();
-
-                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-
-                const htmlResponse = md.render(responseText);
-
-                chatBox.innerHTML += `
-                    <div class="flex justify-start">
-                        <div class="bg-white border p-3 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none">
-                            <strong>IA:</strong><br>
-                            ${htmlResponse}
-                        </div>
-                    </div>`;
-                
-                chatBox.scrollTop = chatBox.scrollHeight;
-
-            } catch (error) {
-                document.getElementById('loading')?.remove();
-                alert("Erro ao conectar com a IA: " + error.message);
-            }
+        } catch (error) {
+            document.getElementById('loading')?.remove();
+            alert("Erro ao conectar com a AmandAI: " + error.message);
+            // Opcional: mostrar mensagem de erro no chat
+            chatBox.innerHTML += `
+                <div class="flex justify-start">
+                    <div class="bg-red-100 border border-red-400 text-red-700 p-3 rounded-lg max-w-[80%]">
+                        Erro: ${error.message}
+                    </div>
+                </div>`;
+        } finally {
+            // Sempre reabilita no final (sucesso ou erro)
+            setLoadingState(false);
         }
+    }
 
-        document.getElementById('pergunta').addEventListener('keydown', function(event) {
-            // Se pressionar Enter (keyCode 13) e NÃO estiver segurando Shift
-            // (Shift + Enter permite quebrar linha, se quiser)
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();         
+
+function mostrarBoasVindas() {
+    const chatBox = document.getElementById('chat-box');
+
+    const mensagemBoasVindas = `
+Olá! Sou AmandAI, sua assisnte virtual! 😊
+
+Posso ajudar você a encontrar informações e responder dúvidas sobre nossa plataforma.
+
+**Digite sua pergunta abaixo** e vamos começar!
+    `;
+
+    const htmlMensagem = md.render(mensagemBoasVindas);
+
+    chatBox.innerHTML = `
+        <div class="flex justify-start">
+            <div class="bg-white border p-3 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none">
+                <strong>AmandAI:</strong><br>
+                ${htmlMensagem}
+            </div>
+        </div>
+    ` + chatBox.innerHTML;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Executa ao carregar a página
+window.addEventListener('load', () => {
+    mostrarBoasVindas();
+});
+
+
+    // Enter para enviar (mantém o comportamento)
+    document.getElementById('pergunta').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();         
+            if (!btnEnviar.disabled) {   // só envia se não estiver bloqueado
                 enviarParaN8N();                 
             }
-        });
-    </script>
-</body>
-</html>
+        }
+    });
+</script>
