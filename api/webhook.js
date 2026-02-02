@@ -1,21 +1,30 @@
-export default async function handler(req, res) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(req) {
   const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
   if (req.method !== 'POST') {
-    return res.status(405).end();
+    return new Response('Method Not Allowed', { status: 405 });
   }
 
   try {
-    const n8nResponse = await fetch(WEBHOOK_URL, {
+    const body = await req.json();
+
+    const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body),
     });
 
-    const data = await n8nResponse.json();
-    res.status(200).json(data);
+    const data = await response.text();
+    return new Response(data, { status: 200 });
 
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao chamar webhook' });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      { status: 500 }
+    );
   }
 }
