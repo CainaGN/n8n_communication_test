@@ -29,12 +29,9 @@
                 placeholder="Digite sua dúvida... (Enter para enviar)" 
                 class="flex-1 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-            <button 
-    onclick="enviarParaN8N()" 
-    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition min-w-[100px] flex items-center justify-center"
->
-    Enviar
-</button>
+            <button onclick="enviarParaN8N()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                Enviar
+            </button>
         </div>
     </div>
 
@@ -51,15 +48,15 @@
 
     // Elementos que vamos controlar
     const inputPergunta = document.getElementById('pergunta');
-    const btnEnviar = document.querySelector('button[onclick="enviarParaN8N()"]'); // ou dê um id ao botão
+    const btnEnviar = document.querySelector('button[onclick="enviarParaN8N()"]'); 
 
     // Função auxiliar para bloquear/desbloquear
     function setLoadingState(isLoading) {
         if (isLoading) {
             btnEnviar.disabled = true;
-            btnEnviar.textContent = 'Enviando...'; // ou mantenha "Enviar" e use outra forma de indicar loading
+            btnEnviar.textContent = 'Enviar'; 
             btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
-            inputPergunta.disabled = true; // opcional: bloqueia o input também
+            inputPergunta.disabled = true; 
         } else {
             btnEnviar.disabled = false;
             btnEnviar.textContent = 'Enviar';
