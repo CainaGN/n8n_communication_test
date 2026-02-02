@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AmandAI - Suporte Play55</title>
+    <link rel="icon" href="icone.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Markdown-it para renderizar Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
@@ -100,7 +101,7 @@
                     chatInput: texto, 
                     sessionId: meuSessionId, 
                     platform: origem,
-                    pracaId: "Sorte Cap",
+                    pracaId: "FortCap",
                     formulario_contato: "[Clique aqui](https://longdogechallenge.com/)"
                 })
             });
@@ -144,7 +145,7 @@ function mostrarBoasVindas() {
     const chatBox = document.getElementById('chat-box');
 
     const mensagemBoasVindas = `
-Olá! Sou AmandAI, sua assistente virtual! 😊
+Olá! Sou **AmandAI**, sua assistente virtual! 😊
 
 Posso ajudar você a encontrar informações e responder dúvidas sobre nossa plataforma.
 
@@ -155,16 +156,22 @@ Posso ajudar você a encontrar informações e responder dúvidas sobre nossa pl
 
     chatBox.innerHTML = `
         <div class="flex justify-start">
-            <div class="bg-white border p-3 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none">
-                <strong>AmandAI:</strong><br>
-                ${htmlMensagem}
+            <div class="bg-white border p-4 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none flex items-start gap-4">
+                <div class="flex-1">
+                    <strong>AmandAI:</strong><br>
+                    ${htmlMensagem}
+                </div>
+                <img 
+                    src="avatar_amandai.jpg" 
+                    alt="AmandAI" 
+                    class="w-32 h-32 rounded-full object-cover border-2 border-blue-300 shadow-md flex-shrink-0"
+                >
             </div>
         </div>
     ` + chatBox.innerHTML;
 
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
 // Executa ao carregar a página
 window.addEventListener('load', () => {
     mostrarBoasVindas();
