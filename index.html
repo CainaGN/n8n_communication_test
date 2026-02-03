@@ -63,7 +63,7 @@
 
     async function enviarParaN8N() {
         const chatBox = document.getElementById('chat-box');
-       // const origem = document.getElementById('origem').value;
+       //const origem = document.getElementById('origem').value;
         const texto = inputPergunta.value.trim();
 
         if (!texto) return;
@@ -95,10 +95,9 @@
                 body: JSON.stringify({ 
                     chatInput: texto, 
                     sessionId: meuSessionId, 
-                    platform: origem,
+                    platform: "mobile",
                     pracaId: "FortCap",
                     formulario_contato: "[Clique aqui](https://longdogechallenge.com/)"
-                    origem: "mobile"  // web ou mobile
                 })
             });
 
