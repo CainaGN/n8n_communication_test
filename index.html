@@ -14,10 +14,6 @@
     <div class="w-full max-w-2xl bg-white shadow-xl rounded-xl flex flex-col h-[80vh]">
         <div class="bg-blue-600 p-4 rounded-t-xl text-white font-bold flex justify-between items-center">
             <span>Assistente de Documentos</span>
-            <select id="origem" class="text-black text-sm rounded p-1">
-                <option value="web">Navegador Web</option>
-                <option value="mobile">Aplicativo Mobile</option>
-            </select>
         </div>
 
         <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></div>
@@ -67,7 +63,7 @@
 
     async function enviarParaN8N() {
         const chatBox = document.getElementById('chat-box');
-        const origem = document.getElementById('origem').value;
+       // const origem = document.getElementById('origem').value;
         const texto = inputPergunta.value.trim();
 
         if (!texto) return;
@@ -79,7 +75,6 @@
         chatBox.innerHTML += `
             <div class="flex justify-end">
                 <div class="bg-blue-500 text-white p-3 rounded-lg max-w-[80%] shadow-sm text-xs mb-1">
-                    <small class="block opacity-75">Origem: ${origem}</small>
                     ${texto}
                 </div>
             </div>`;
@@ -103,6 +98,7 @@
                     platform: origem,
                     pracaId: "FortCap",
                     formulario_contato: "[Clique aqui](https://longdogechallenge.com/)"
+                    origem: "mobile"  // web ou mobile
                 })
             });
 
