@@ -66,6 +66,11 @@
        //const origem = document.getElementById('origem').value;
         const texto = inputPergunta.value.trim();
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const pracaId = urlParams.get('pracaId') || ' ';
+        const platform = urlParams.get('platform') || 'web/mobile';
+
+
         if (!texto) return;
 
         // Bloqueia imediatamente
@@ -95,9 +100,9 @@
                 body: JSON.stringify({ 
                     chatInput: texto, 
                     sessionId: meuSessionId, 
-                    platform: "mobile",
-                    pracaId: "FortCap",
-                    formulario_contato: "[Clique aqui](https://longdogechallenge.com/)"
+                    platform: platform,
+                    pracaId: pracaId,
+                    formulario_contato: formulario_contato
                 })
             });
 
