@@ -36,11 +36,15 @@
     
     // Instância global do markdown-it
     const md = window.markdownit({
-        html: true,
-        linkify: true,
-        typographer: true,
-        breaks: true
-    });
+    html: true,
+    linkify: {
+        fuzzyLink: false,          // desativa links "fuzzy" (sem http/www)
+        fuzzyEmail: false,         // desativa detecção automática de e-mails
+        fuzzyIP: false
+    },
+    typographer: true,
+    breaks: true
+});
 
     // Elementos que vamos controlar
     const inputPergunta = document.getElementById('pergunta');
