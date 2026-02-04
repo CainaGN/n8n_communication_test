@@ -73,21 +73,9 @@
         const urlParams = new URLSearchParams(window.location.search);
         const pracaId = urlParams.get('pracaId') || ' ';
         const platform = urlParams.get('platform') || 'web/mobile';
+        // No início do script
+        const formulario_contato = "https://wa.me/55556791698264";  
 
-        const formularioContatoRaw = urlParams.get('formulario_contato');
-
-        // Decodifica o link (porque ele vem codificado na URL)
-        let formulario_contato = '';
-        if (formularioContatoRaw) {
-            try {
-                formulario_contato = decodeURIComponent(formularioContatoRaw);
-            } catch (e) {
-                console.warn('Link de formulário inválido na URL', e);
-                formulario_contato = ''; 
-            }
-        } else {
-            formulario_contato = '[Clique aqui](https://longdogechallenge.com/)';
-        }
 
         if (!texto) return;
 
