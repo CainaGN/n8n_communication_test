@@ -70,6 +70,20 @@
         const pracaId = urlParams.get('pracaId') || ' ';
         const platform = urlParams.get('platform') || 'web/mobile';
 
+        const formularioContatoRaw = urlParams.get('formulario_contato');
+
+        // Decodifica o link (porque ele vem codificado na URL)
+        let formulario_contato = '';
+        if (formularioContatoRaw) {
+            try {
+                formulario_contato = decodeURIComponent(formularioContatoRaw);
+            } catch (e) {
+                console.warn('Link de formulário inválido na URL', e);
+                formulario_contato = ''; 
+            }
+        } else {
+            formulario_contato = '[Clique aqui](https://longdogechallenge.com/)';
+        }
 
         if (!texto) return;
 
@@ -102,8 +116,7 @@
                     sessionId: meuSessionId, 
                     platform: platform,
                     pracaId: pracaId,
-                    formulario_contato: "[Clique aqui](https://www.google.com.br)"
-                    // formulario_contato: formulario_contato
+                    formulario_contato: formulario_contato
                 })
             });
 
