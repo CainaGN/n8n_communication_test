@@ -73,7 +73,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const pracaId = urlParams.get('pracaId') || ' ';
         const platform = urlParams.get('platform') || 'web/mobile';
-        // No início do script
         const formulario_contato = "https://wa.me/55556791698264";  
 
 
@@ -133,7 +132,7 @@
         } catch (error) {
             document.getElementById('loading')?.remove();
             alert("Erro ao conectar com a AmandAI: " + error.message);
-            // Opcional: mostrar mensagem de erro no chat
+            // mostrar mensagem de erro no chat
             chatBox.innerHTML += `
                 <div class="flex justify-start">
                     <div class="bg-red-100 border border-red-400 text-red-700 p-3 rounded-lg max-w-[80%]">
