@@ -21,8 +21,6 @@
         <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></div>
 
         <div class="p-4 border-t flex gap-2">
-            <input type="text" id="pergunta" placeholder="Digite sua dúvida... (Enter para enviar)"
-                class="flex-1 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button id="btn-voice" type="button"
                 class="bg-gray-200 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-300 transition flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -31,6 +29,8 @@
                         d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
             </button>
+            <input type="text" id="pergunta" placeholder="Digite sua dúvida... (Enter para enviar)"
+                class="flex-1 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <button onclick="enviarParaN8N()"
                 class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
                 Enviar
@@ -56,6 +56,17 @@
         // Elementos que vamos controlar
         const inputPergunta = document.getElementById('pergunta');
         const btnEnviar = document.querySelector('button[onclick="enviarParaN8N()"]');
+        const btnVoice = document.getElementById('btn-voice');
+
+        // Variáveis para gravação de áudio
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let audioStream;
+
+        // Detectar plataforma
+        const urlParams = new URLSearchParams(window.location.search);
+        const platform = urlParams.get('platform') || 'web/mobile'; // Ajuste para 'web' ou 'mobile' conforme sua lógica de URL
 
         // Função auxiliar para bloquear/desbloquear
         function setLoadingState(isLoading) {
@@ -69,6 +80,130 @@
                 btnEnviar.textContent = 'Enviar';
                 btnEnviar.classList.remove('opacity-50', 'cursor-not-allowed');
                 inputPergunta.disabled = false;
+            }
+        }
+
+        // Função para iniciar gravação
+        async function startRecording() {
+            if (isRecording) return;
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(audioStream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                btnVoice.classList.add('bg-red-500', 'text-white'); // Indicar gravação
+            } catch (error) {
+                console.error('Erro ao acessar microfone:', error);
+                alert('Não foi possível acessar o microfone. Verifique as permissões.');
+            }
+        }
+
+        // Função para parar gravação e enviar
+        function stopRecording() {
+            if (!isRecording) return;
+            mediaRecorder.stop();
+            isRecording = false;
+            btnVoice.classList.remove('bg-red-500', 'text-white');
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                await enviarAudioParaBackend(audioBlob);
+            };
+        }
+
+        // Configurar listeners baseados na plataforma
+        if (platform === 'web') {
+            // Para web: toggle com click
+            btnVoice.addEventListener('click', () => {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording();
+                }
+            });
+        } else if (platform === 'mobile') {
+            // Para mobile: start on touchstart, stop on touchend
+            btnVoice.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startRecording();
+            });
+            btnVoice.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                stopRecording();
+            });
+        }
+
+        // Função para enviar áudio ao backend
+        async function enviarAudioParaBackend(audioBlob) {
+            const chatBox = document.getElementById('chat-box');
+            const pracaId = urlParams.get('pracaId') || ' ';
+            const formulario_contato = "https://wa.me/55556791698264";
+
+            setLoadingState(true);
+
+            // Mostra indicador de processamento
+            chatBox.innerHTML += `
+            <div class="flex justify-end">
+                <div class="bg-blue-500 text-white p-3 rounded-lg max-w-[80%] shadow-sm text-xs mb-1">
+                    [Áudio enviado para transcrição...]
+                </div>
+            </div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = "loading";
+            loadingDiv.innerHTML = `<div class="bg-gray-200 p-3 rounded-lg inline-block animate-pulse">AmandAI está processando o áudio...</div>`;
+            chatBox.appendChild(loadingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'voice.webm');
+                formData.append('sessionId', meuSessionId);
+                formData.append('platform', platform);
+                formData.append('pracaId', pracaId);
+                formData.append('formulario_contato', formulario_contato);
+
+                const response = await fetch('/api/webhook', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const responseText = await response.text();
+
+                document.getElementById('loading')?.remove();
+
+                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+
+                const htmlResponse = md.render(responseText);
+
+                chatBox.innerHTML += `
+                <div class="flex justify-start">
+                    <div class="bg-white border p-3 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none">
+                        <strong>AmandAI:</strong><br>
+                        ${htmlResponse}
+                    </div>
+                </div>`;
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } catch (error) {
+                document.getElementById('loading')?.remove();
+                alert("Erro ao processar áudio: " + error.message);
+                chatBox.innerHTML += `
+                <div class="flex justify-start">
+                    <div class="bg-red-100 border border-red-400 text-red-700 p-3 rounded-lg max-w-[80%]">
+                        Erro: ${error.message}
+                    </div>
+                </div>`;
+            } finally {
+                setLoadingState(false);
             }
         }
 
@@ -200,3 +335,5 @@ Posso ajudar você a encontrar informações e responder dúvidas sobre nossa pl
             }
         });
     </script>
+</body>
+</html>
