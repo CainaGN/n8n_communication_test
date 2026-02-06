@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <!-- Markdown-it para renderizar Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
 </head>
+
 <body class="bg-slate-100 h-screen flex flex-col items-center justify-center p-4">
 
     <div class="w-full max-w-2xl bg-white shadow-xl rounded-xl flex flex-col h-[80vh]">
@@ -19,137 +21,142 @@
         <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></div>
 
         <div class="p-4 border-t flex gap-2">
-            <input 
-                type="text" 
-                id="pergunta" 
-                placeholder="Digite sua dúvida... (Enter para enviar)" 
-                class="flex-1 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-            <button onclick="enviarParaN8N()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+            <input type="text" id="pergunta" placeholder="Digite sua dúvida... (Enter para enviar)"
+                class="flex-1 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="btn-voice" type="button"
+                class="bg-gray-200 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-300 transition flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+            </button>
+            <button onclick="enviarParaN8N()"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
                 Enviar
             </button>
         </div>
     </div>
 
     <script>
-    const meuSessionId = "user_" + Math.random().toString(36).substr(2, 9);
-    
-    // Instância global do markdown-it
-    const md = window.markdownit({
-    html: true,
-    linkify: {
-        fuzzyLink: false,          // desativa links "fuzzy" (sem http/www)
-        fuzzyEmail: false,         // desativa detecção automática de e-mails
-        fuzzyIP: false
-    },
-    typographer: true,
-    breaks: true
-    });
+        const meuSessionId = "user_" + Math.random().toString(36).substr(2, 9);
 
-    // Elementos que vamos controlar
-    const inputPergunta = document.getElementById('pergunta');
-    const btnEnviar = document.querySelector('button[onclick="enviarParaN8N()"]'); 
+        // Instância global do markdown-it
+        const md = window.markdownit({
+            html: true,
+            linkify: {
+                fuzzyLink: false,          // desativa links "fuzzy" (sem http/www)
+                fuzzyEmail: false,         // desativa detecção automática de e-mails
+                fuzzyIP: false
+            },
+            typographer: true,
+            breaks: true
+        });
 
-    // Função auxiliar para bloquear/desbloquear
-    function setLoadingState(isLoading) {
-        if (isLoading) {
-            btnEnviar.disabled = true;
-            btnEnviar.textContent = 'Enviar'; 
-            btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
-            inputPergunta.disabled = true; 
-        } else {
-            btnEnviar.disabled = false;
-            btnEnviar.textContent = 'Enviar';
-            btnEnviar.classList.remove('opacity-50', 'cursor-not-allowed');
-            inputPergunta.disabled = false;
+        // Elementos que vamos controlar
+        const inputPergunta = document.getElementById('pergunta');
+        const btnEnviar = document.querySelector('button[onclick="enviarParaN8N()"]');
+
+        // Função auxiliar para bloquear/desbloquear
+        function setLoadingState(isLoading) {
+            if (isLoading) {
+                btnEnviar.disabled = true;
+                btnEnviar.textContent = 'Enviar';
+                btnEnviar.classList.add('opacity-50', 'cursor-not-allowed');
+                inputPergunta.disabled = true;
+            } else {
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = 'Enviar';
+                btnEnviar.classList.remove('opacity-50', 'cursor-not-allowed');
+                inputPergunta.disabled = false;
+            }
         }
-    }
 
-    async function enviarParaN8N() {
-        const chatBox = document.getElementById('chat-box');
-       //const origem = document.getElementById('origem').value;
-        const texto = inputPergunta.value.trim();
+        async function enviarParaN8N() {
+            const chatBox = document.getElementById('chat-box');
+            //const origem = document.getElementById('origem').value;
+            const texto = inputPergunta.value.trim();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const pracaId = urlParams.get('pracaId') || ' ';
-        const platform = urlParams.get('platform') || 'web/mobile';
-        const formulario_contato = "https://wa.me/55556791698264";  
+            const urlParams = new URLSearchParams(window.location.search);
+            const pracaId = urlParams.get('pracaId') || ' ';
+            const platform = urlParams.get('platform') || 'web/mobile';
+            const formulario_contato = "https://wa.me/55556791698264";
 
 
-        if (!texto) return;
+            if (!texto) return;
 
-        // Bloqueia imediatamente
-        setLoadingState(true);
+            // Bloqueia imediatamente
+            setLoadingState(true);
 
-        // Mostra mensagem do usuário
-        chatBox.innerHTML += `
+            // Mostra mensagem do usuário
+            chatBox.innerHTML += `
             <div class="flex justify-end">
                 <div class="bg-blue-500 text-white p-3 rounded-lg max-w-[80%] shadow-sm text-xs mb-1">
                     ${texto}
                 </div>
             </div>`;
-        
-        inputPergunta.value = '';
-        chatBox.scrollTop = chatBox.scrollHeight;
 
-        const loadingDiv = document.createElement('div');
-        loadingDiv.id = "loading";
-        loadingDiv.innerHTML = `<div class="bg-gray-200 p-3 rounded-lg inline-block animate-pulse">AmandAI está digitando...</div>`;
-        chatBox.appendChild(loadingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
+            inputPergunta.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-        try {
-            const response = await fetch('/api/webhook', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chatInput: texto, 
-                    sessionId: meuSessionId, 
-                    platform: platform,
-                    pracaId: pracaId,
-                    formulario_contato: formulario_contato
-                })
-            });
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = "loading";
+            loadingDiv.innerHTML = `<div class="bg-gray-200 p-3 rounded-lg inline-block animate-pulse">AmandAI está digitando...</div>`;
+            chatBox.appendChild(loadingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-            const responseText = await response.text();
-            
-            document.getElementById('loading')?.remove();
+            try {
+                const response = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatInput: texto,
+                        sessionId: meuSessionId,
+                        platform: platform,
+                        pracaId: pracaId,
+                        formulario_contato: formulario_contato
+                    })
+                });
 
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                const responseText = await response.text();
 
-            const htmlResponse = md.render(responseText);
+                document.getElementById('loading')?.remove();
 
-            chatBox.innerHTML += `
+                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+
+                const htmlResponse = md.render(responseText);
+
+                chatBox.innerHTML += `
                 <div class="flex justify-start">
                     <div class="bg-white border p-3 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none">
                         <strong>AmandAI:</strong><br>
                         ${htmlResponse}
                     </div>
                 </div>`;
-            
-            chatBox.scrollTop = chatBox.scrollHeight;
 
-        } catch (error) {
-            document.getElementById('loading')?.remove();
-            alert("Erro ao conectar com a AmandAI: " + error.message);
-            // mostrar mensagem de erro no chat
-            chatBox.innerHTML += `
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } catch (error) {
+                document.getElementById('loading')?.remove();
+                alert("Erro ao conectar com a AmandAI: " + error.message);
+                // mostrar mensagem de erro no chat
+                chatBox.innerHTML += `
                 <div class="flex justify-start">
                     <div class="bg-red-100 border border-red-400 text-red-700 p-3 rounded-lg max-w-[80%]">
                         Erro: ${error.message}
                     </div>
                 </div>`;
-        } finally {
-            // Sempre reabilita no final (sucesso ou erro)
-            setLoadingState(false);
+            } finally {
+                // Sempre reabilita no final (sucesso ou erro)
+                setLoadingState(false);
+            }
         }
-    }
 
 
-function mostrarBoasVindas() {
-    const chatBox = document.getElementById('chat-box');
+        function mostrarBoasVindas() {
+            const chatBox = document.getElementById('chat-box');
 
-    const mensagemBoasVindas = `
+            const mensagemBoasVindas = `
 Olá! Sou **AmandAI**, sua assistente virtual! 😊
 
 Posso ajudar você a encontrar informações e responder dúvidas sobre nossa plataforma.
@@ -157,9 +164,9 @@ Posso ajudar você a encontrar informações e responder dúvidas sobre nossa pl
 **Digite sua pergunta abaixo** e vamos começar!
     `;
 
-    const htmlMensagem = md.render(mensagemBoasVindas);
+            const htmlMensagem = md.render(mensagemBoasVindas);
 
-    chatBox.innerHTML = `
+            chatBox.innerHTML = `
         <div class="flex justify-start">
             <div class="bg-white border p-4 rounded-lg max-w-[80%] shadow-sm text-gray-800 prose prose-sm max-w-none flex items-start gap-4">
                 <div class="flex-1">
@@ -175,21 +182,21 @@ Posso ajudar você a encontrar informações e responder dúvidas sobre nossa pl
         </div>
     ` + chatBox.innerHTML;
 
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-// Executa ao carregar a página
-window.addEventListener('load', () => {
-    mostrarBoasVindas();
-});
-
-
-    // Enter para enviar (mantém o comportamento)
-    document.getElementById('pergunta').addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();         
-            if (!btnEnviar.disabled) {   // só envia se não estiver bloqueado
-                enviarParaN8N();                 
-            }
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
-    });
-</script>
+        // Executa ao carregar a página
+        window.addEventListener('load', () => {
+            mostrarBoasVindas();
+        });
+
+
+        // Enter para enviar (mantém o comportamento)
+        document.getElementById('pergunta').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (!btnEnviar.disabled) {   // só envia se não estiver bloqueado
+                    enviarParaN8N();
+                }
+            }
+        });
+    </script>
